@@ -27,7 +27,7 @@ class ReadFiles
       transaction = arr[6]
       if /^[A-Z][A-Z0-9]*$/.match?(transaction)
         @statistics[transaction] ||= 0
-        @statistics[transaction] += 1 
+        @statistics[transaction] += 1
       end
     end
   end
