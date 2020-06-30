@@ -4,4 +4,4 @@ count = ReadFiles.new
 
 count.start
 
-puts pp count.transaction
+pp count.statistics
