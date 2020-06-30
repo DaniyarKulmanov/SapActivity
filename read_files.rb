@@ -9,9 +9,12 @@ class ReadFiles
 
   def start
     open_files
-    @files_data.flatten!
-    count_transaction
+    convert_data_to_single_array
+    count_transactions
+    write_to_file
   end
+
+  private
 
   def open_files
     Dir.glob('data/*.txt').each do |filename|
@@ -21,9 +24,17 @@ class ReadFiles
     end
   end
 
-  def count_transaction
+  def convert_data_to_single_array
+    @files_data.flatten!
+  end
+
+  def count_transactions
     @files_data.each do |line|
+    begin
       arr = line.split
+    rescue ArgumentError
+      next
+    end
       transaction = arr[6]
       if /^[A-Z][A-Z0-9]*$/.match?(transaction)
         @statistics[transaction] ||= 0
@@ -32,8 +43,9 @@ class ReadFiles
     end
   end
 
-  def write_to_file(statistic)
-    # IO.write("data/test_100.txt", array.join("\n"))
+  def write_to_file
+    @statistics = @statistics.sort_by{|key, value| value}.reverse
+    IO.write("data/result/result.txt", @statistics)
   end
 
 end

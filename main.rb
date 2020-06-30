@@ -4,4 +4,5 @@ count = ReadFiles.new
 
 count.start
 
-pp count.statistics
+puts 'done' unless count.statistics.nil?
+pp count.statistics.first(20)
