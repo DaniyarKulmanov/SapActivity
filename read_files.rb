@@ -1,6 +1,6 @@
 class ReadFiles
   attr_reader :statistics
-
+  MASK = /^[A-Z][A-Z0-9]*$/
 
   def initialize
     @files_data = []
@@ -36,7 +36,7 @@ class ReadFiles
       next
     end
       transaction = arr[6]
-      if /^[A-Z][A-Z0-9]*$/.match?(transaction)
+      if MASK.match?(transaction)
         @statistics[transaction] ||= 0
         @statistics[transaction] += 1
       end
