@@ -1,19 +1,23 @@
 require 'csv'
 
 class ReadFiles
-  attr_reader :statistics
+  attr_reader :transactions, :be, :dates
   MASK = /^[A-Z][A-Z0-9]*$/
   BATCH_USERS = %w( WF-BATCH PI-BATCH )
+  SAPMSYST = 'SAPMSYST'
 
   def initialize
     @files_data = []
-    @statistics = {}
+    @transactions = {}
+    @be = {}
+    @dates = {}
   end
 
   def start
     read_files
     convert_data_to_single_array
-    count_transactions
+    extract_files
+    sort_all
     write_to_csv_file
   end
 
@@ -31,36 +35,51 @@ class ReadFiles
     @files_data.flatten!
   end
 
-  def count_transactions
+  def extract_files
     @files_data.each do |line|
     begin
       file_line = line.split
     rescue ArgumentError
       next
     end
-      transaction = file_line[6]
-      if conditions file_line
-        @statistics[transaction] ||= 0
-        @statistics[transaction] += 1
-      end
+      collect_data file_line if conditions file_line
     end
-    @statistics = @statistics.sort_by{|key, value| value}.reverse
   end
 
   def write_to_csv_file
-    CSV.open('data/result/result.csv', 'w', col_sep: ';') do |csv|
-      @statistics.each do |transaction_name, count|
-        csv << [transaction_name, count]
-      end
+    CSV.open('data/result/transactions.csv', 'w', col_sep: ';') do |csv|
+      collect_results transactions, csv
+    end
+    CSV.open('data/result/be.csv', 'w', col_sep: ';') do |csv|
+      collect_results be, csv
+    end
+    CSV.open('data/result/dates.csv', 'w', col_sep: ';') do |csv|
+      collect_results dates, csv
     end
   end
 
-  def conditions(data)
-    MASK.match?(data[6]) && BATCH_USERS.none?(data[4])
+  def conditions(met)
+    MASK.match?(met[6]) && BATCH_USERS.none?(met[4]) && met[6] != SAPMSYST
   end
 
   def collect_data(data)
-    
+    @transactions[data[6]] ||= 0
+    @transactions[data[6]] += 1
+    @be[data[4][0..2]] ||= 0
+    @be[data[4][0..2]] += 1
+    @dates[data[1]] ||= 0
+    @dates[data[1]] += 1
+  end
+
+  def sort_all
+    @transactions = @transactions.sort_by{|key, value| value}.reverse
+    @be = @be.sort_by{|key, value| value}.reverse
+  end
+
+  def collect_results(table, csv)
+    table.each do |key, value|
+      csv << [key, value]
+    end
   end
 
 end
