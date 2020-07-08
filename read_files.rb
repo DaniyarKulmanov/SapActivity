@@ -1,6 +1,9 @@
+require 'csv'
+
 class ReadFiles
   attr_reader :statistics
   MASK = /^[A-Z][A-Z0-9]*$/
+  BATCH_USERS = %w( WF-BATCH PI-BATCH )
 
   def initialize
     @files_data = []
@@ -8,15 +11,15 @@ class ReadFiles
   end
 
   def start
-    open_files
+    read_files
     convert_data_to_single_array
     count_transactions
-    write_to_file
+    write_to_csv_file
   end
 
   private
 
-  def open_files
+  def read_files
     Dir.glob('data/*.txt').each do |filename|
       File.open(filename) do |file|
         @files_data << file.readlines
@@ -31,21 +34,33 @@ class ReadFiles
   def count_transactions
     @files_data.each do |line|
     begin
-      arr = line.split
+      file_line = line.split
     rescue ArgumentError
       next
     end
-      transaction = arr[6]
-      if MASK.match?(transaction)
+      transaction = file_line[6]
+      if conditions file_line
         @statistics[transaction] ||= 0
         @statistics[transaction] += 1
       end
     end
+    @statistics = @statistics.sort_by{|key, value| value}.reverse
   end
 
-  def write_to_file
-    @statistics = @statistics.sort_by{|key, value| value}.reverse
-    IO.write("data/result/result.txt", @statistics)
+  def write_to_csv_file
+    CSV.open('data/result/result.csv', 'w', col_sep: ';') do |csv|
+      @statistics.each do |transaction_name, count|
+        csv << [transaction_name, count]
+      end
+    end
+  end
+
+  def conditions(data)
+    MASK.match?(data[6]) && BATCH_USERS.none?(data[4])
+  end
+
+  def collect_data(data)
+    
   end
 
 end
