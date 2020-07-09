@@ -1,7 +1,7 @@
 require 'csv'
 
 class ReadFiles
-  attr_reader :transactions, :be, :dates
+  attr_reader :transactions, :users, :dates
   MASK = /^[A-Z][A-Z0-9]*$/
   BATCH_USERS = %w( WF-BATCH PI-BATCH )
   SAPMSYST = 'SAPMSYST'
@@ -50,8 +50,8 @@ class ReadFiles
     CSV.open('data/result/transactions.csv', 'w', col_sep: ';') do |csv|
       collect_results transactions, csv
     end
-    CSV.open('data/result/be.csv', 'w', col_sep: ';') do |csv|
-      collect_results be, csv
+    CSV.open('data/result/users.csv', 'w', col_sep: ';') do |csv|
+      collect_results users, csv
     end
     CSV.open('data/result/dates.csv', 'w', col_sep: ';') do |csv|
       collect_results dates, csv
@@ -65,8 +65,8 @@ class ReadFiles
   def collect_data(data)
     @transactions[data[6]] ||= 0
     @transactions[data[6]] += 1
-    @be[data[4][0..2]] ||= 0
-    @be[data[4][0..2]] += 1
+    @be[data[4]] ||= 0
+    @be[data[4]] += 1
     @dates[data[1]] ||= 0
     @dates[data[1]] += 1
   end
