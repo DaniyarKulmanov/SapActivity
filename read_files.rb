@@ -9,7 +9,7 @@ class ReadFiles
   def initialize
     @files_data = []
     @transactions = {}
-    @be = {}
+    @users = {}
     @dates = {}
   end
 
@@ -65,15 +65,15 @@ class ReadFiles
   def collect_data(data)
     @transactions[data[6]] ||= 0
     @transactions[data[6]] += 1
-    @be[data[4]] ||= 0
-    @be[data[4]] += 1
+    @users[data[4]] ||= 0
+    @users[data[4]] += 1
     @dates[data[1]] ||= 0
     @dates[data[1]] += 1
   end
 
   def sort_all
     @transactions = @transactions.sort_by{|key, value| value}.reverse
-    @be = @be.sort_by{|key, value| value}.reverse
+    @users = @users.sort_by{|key, value| value}.reverse
   end
 
   def collect_results(table, csv)
