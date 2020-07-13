@@ -1,7 +1,7 @@
 require 'csv'
 
 class ReadFiles
-  attr_reader :transactions, :users, :dates, :files_data
+  attr_reader :transactions, :users, :dates, :files_data, :users_and_dates
   MASK = /^[A-Z][A-Z0-9]*$/
   BATCH_USERS = %w( WF-BATCH PI-BATCH )
   SAPMSYST = 'SAPMSYST'
@@ -11,6 +11,7 @@ class ReadFiles
     @transactions = {}
     @users = {}
     @dates = {}
+    @users_and_dates = {}
   end
 
   def start
@@ -56,6 +57,9 @@ class ReadFiles
     CSV.open('data/result/dates.csv', 'w', col_sep: ';') do |csv|
       collect_results dates, csv
     end
+    CSV.open('data/result/users_and_dates.csv', 'w', col_sep: ';') do |csv|
+      collect_results users_and_dates, csv
+    end
   end
 
   def conditions(met)
@@ -69,15 +73,18 @@ class ReadFiles
     @users[data[4]] += 1
     @dates[data[1]] ||= 0
     @dates[data[1]] += 1
+    @users_and_dates[data[4] + ' - ' + data[1]] ||= 0
+    @users_and_dates[data[4] + ' - ' + data[1]] += 1
   end
 
   def sort_all
     @transactions = @transactions.sort_by{|key, value| value}.reverse
     @users = @users.sort_by{|key, value| value}.reverse
+    @users_and_dates = @users_and_dates.sort_by{|key, value| value}.reverse
   end
 
   def collect_results(table, csv)
-    table.each do |key, value|
+    table.first(20).each do |key, value|
       csv << [key, value]
     end
   end
