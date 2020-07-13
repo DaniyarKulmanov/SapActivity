@@ -1,7 +1,7 @@
 require 'csv'
 
 class ReadFiles
-  attr_reader :transactions, :users, :dates
+  attr_reader :transactions, :users, :dates, :files_data
   MASK = /^[A-Z][A-Z0-9]*$/
   BATCH_USERS = %w( WF-BATCH PI-BATCH )
   SAPMSYST = 'SAPMSYST'
@@ -37,11 +37,11 @@ class ReadFiles
 
   def extract_files
     @files_data.each do |line|
-    begin
-      file_line = line.split
-    rescue ArgumentError
-      next
-    end
+      begin
+        file_line = line.split
+      rescue ArgumentError
+        next
+      end
       collect_data file_line if conditions file_line
     end
   end
