@@ -81,6 +81,7 @@ class ReadFiles
     @transactions = @transactions.sort_by{|key, value| value}.reverse
     @users = @users.sort_by{|key, value| value}.reverse
     @users_and_dates = @users_and_dates.sort_by{|key, value| value}.reverse
+    @dates = @dates.sort_by{|key, value| value}.reverse
   end
 
   def collect_results(table, csv)
