@@ -12,6 +12,8 @@ class ReadFiles
     @users = {}
     @dates = {}
     @users_and_dates = {}
+
+
   end
 
   def start
